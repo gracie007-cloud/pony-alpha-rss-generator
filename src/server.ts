@@ -5,9 +5,8 @@ import { formatFeed } from './formatters';
 import { createApiRoutes, createUiRoutes } from './routes';
 
 export function createServer(port = 3000) {
-  const generator = new FeedGenerator(
-    configManager.getConfig(),
-    (cb) => configManager.onConfigChange(cb)
+  const generator = new FeedGenerator(configManager.getConfig(), (cb) =>
+    configManager.onConfigChange(cb),
   );
 
   const apiRoutes = createApiRoutes(generator, configManager);
@@ -45,7 +44,10 @@ export function createServer(port = 3000) {
       if (path === '/api/config' && request.method === 'PATCH') {
         return uiRoutes.handleUpdateConfig(request);
       }
-      if (path === '/api/config/content-options' && request.method === 'PATCH') {
+      if (
+        path === '/api/config/content-options' &&
+        request.method === 'PATCH'
+      ) {
         return uiRoutes.handleUpdateContentOptions(request);
       }
       if (path === '/api/config/field-behavior' && request.method === 'PATCH') {
@@ -87,7 +89,9 @@ export function createServer(port = 3000) {
 ${configManager
   .getConfig()
   .endpoints.filter((e) => e.enabled)
-  .map((e) => `║    ${e.path.padEnd(20)} (${e.format})                         ║`)
+  .map(
+    (e) => `║    ${e.path.padEnd(20)} (${e.format})                         ║`,
+  )
   .join('\n')}
 ╚══════════════════════════════════════════════════════════════╝
 `);

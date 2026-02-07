@@ -5,11 +5,16 @@ import { formatFeed } from '../formatters';
 
 export function createApiRoutes(
   generator: FeedGenerator,
-  configManager: ConfigManager
+  configManager: ConfigManager,
 ) {
   return {
-    async handleFeed(request: Request, format: ContentSourceFormat): Promise<Response> {
-      const items = generator.getItems();
+    async handleFeed(
+      request: Request,
+      format: ContentSourceFormat,
+    ): Promise<Response> {
+      const url = new URL(request.url);
+      const source = url.searchParams.get('source') || 'default';
+      const items = generator.getItems(source);
       const config = configManager.getConfig();
       const content = formatFeed(items, config, format);
 
@@ -31,39 +36,46 @@ export function createApiRoutes(
 
     async handleUpdateConfig(request: Request): Promise<Response> {
       try {
-        const updates = await request.json() as Partial<FeedConfig>;
+        const updates = (await request.json()) as Partial<FeedConfig>;
         configManager.updateConfig(updates);
-        return Response.json({ success: true, config: configManager.getConfig() });
+        return Response.json({
+          success: true,
+          config: configManager.getConfig(),
+        });
       } catch (error) {
         return Response.json(
           { error: error instanceof Error ? error.message : 'Unknown error' },
-          { status: 400 }
+          { status: 400 },
         );
       }
     },
 
     async handleUpdateContentOptions(request: Request): Promise<Response> {
       try {
-        const updates = await request.json() as Partial<FeedConfig['contentOptions']>;
+        const updates = (await request.json()) as Partial<
+          FeedConfig['contentOptions']
+        >;
         configManager.updateContentOptions(updates);
         return Response.json({ success: true });
       } catch (error) {
         return Response.json(
           { error: error instanceof Error ? error.message : 'Unknown error' },
-          { status: 400 }
+          { status: 400 },
         );
       }
     },
 
     async handleUpdateFieldBehavior(request: Request): Promise<Response> {
       try {
-        const updates = await request.json() as Partial<FeedConfig['fieldBehavior']>;
+        const updates = (await request.json()) as Partial<
+          FeedConfig['fieldBehavior']
+        >;
         configManager.updateFieldBehavior(updates);
         return Response.json({ success: true });
       } catch (error) {
         return Response.json(
           { error: error instanceof Error ? error.message : 'Unknown error' },
-          { status: 400 }
+          { status: 400 },
         );
       }
     },

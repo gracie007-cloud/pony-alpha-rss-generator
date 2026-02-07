@@ -3,7 +3,7 @@ import type { FeedConfig, GeneratedItem } from '../types';
 export function formatNewsML(
   items: GeneratedItem[],
   config: FeedConfig,
-  g2 = false
+  g2 = false,
 ): string {
   const escapeXml = (str: string) =>
     str

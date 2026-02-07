@@ -2,7 +2,7 @@ import type { FeedConfig, GeneratedItem } from '../types';
 
 export function formatJsonFeed(
   items: GeneratedItem[],
-  config: FeedConfig
+  config: FeedConfig,
 ): string {
   const feed = {
     version: 'https://jsonfeed.org/version/1.1',

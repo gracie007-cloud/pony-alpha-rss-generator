@@ -3,7 +3,7 @@ import type { FeedConfig, GeneratedItem } from '../types';
 export function formatRSS(
   items: GeneratedItem[],
   config: FeedConfig,
-  version: '0.91' | '0.92' | '2.0' = '2.0'
+  version: '0.91' | '0.92' | '2.0' = '2.0',
 ): string {
   const escapeXml = (str: string) =>
     str

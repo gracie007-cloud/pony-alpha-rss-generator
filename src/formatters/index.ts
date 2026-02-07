@@ -9,7 +9,7 @@ import { formatGenericXml } from './xml';
 export function formatFeed(
   items: GeneratedItem[],
   config: FeedConfig,
-  format: ContentSourceFormat
+  format: ContentSourceFormat,
 ): string {
   switch (format) {
     case 'RSS':
@@ -35,4 +35,11 @@ export function formatFeed(
   }
 }
 
-export { formatRSS, formatAtom, formatJsonFeed, formatNewsML, formatNITF, formatGenericXml };
+export {
+  formatRSS,
+  formatAtom,
+  formatJsonFeed,
+  formatNewsML,
+  formatNITF,
+  formatGenericXml,
+};

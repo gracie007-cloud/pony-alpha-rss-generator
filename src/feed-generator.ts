@@ -8,7 +8,7 @@ import type {
 // Fast random data generation without external dependencies
 const LOREM_WORDS =
   'lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(
-    ' '
+    ' ',
   );
 
 const TITLES = [
@@ -61,9 +61,7 @@ export class FeedGenerator {
 
   constructor(
     private config: FeedConfig,
-    private onConfigChange: (
-      cb: (config: FeedConfig) => void
-    ) => () => void
+    private onConfigChange: (cb: (config: FeedConfig) => void) => () => void,
   ) {
     this.regenerate();
     onConfigChange((newConfig) => {
@@ -124,7 +122,19 @@ export class FeedGenerator {
     return words.join(' ') + '.';
   }
 
-  private shouldIncludeField(field: 'title' | 'summary' | 'content' | 'link' | 'imageUrl' | 'author' | 'publishedAt' | 'guid' | 'lastModifiedAt' | 'categories'): boolean {
+  private shouldIncludeField(
+    field:
+      | 'title'
+      | 'summary'
+      | 'content'
+      | 'link'
+      | 'imageUrl'
+      | 'author'
+      | 'publishedAt'
+      | 'guid'
+      | 'lastModifiedAt'
+      | 'categories',
+  ): boolean {
     const presenceKey = `${field}Presence` as keyof FeedConfig['fieldBehavior'];
     const presence = this.config.fieldBehavior[presenceKey] as number;
     return Math.random() < presence;
@@ -134,13 +144,15 @@ export class FeedGenerator {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 
-  private generateMedia(options: FeedConfig['contentOptions']): ExtractedMedia[] {
+  private generateMedia(
+    options: FeedConfig['contentOptions'],
+  ): ExtractedMedia[] {
     const media: ExtractedMedia[] = [];
 
     if (options.includeImages) {
       const imageCount = this.randomInt(
         options.imageCount.min,
-        options.imageCount.max
+        options.imageCount.max,
       );
       for (let i = 0; i < imageCount; i++) {
         const base = this.pickRandom(IMAGES);
@@ -168,7 +180,7 @@ export class FeedGenerator {
 
   private generateContent(
     options: FeedConfig['contentOptions'],
-    media: ExtractedMedia[]
+    media: ExtractedMedia[],
   ): string {
     const paragraphs = this.randomInt(3, 7);
     const content: string[] = [];
@@ -176,7 +188,7 @@ export class FeedGenerator {
     for (let i = 0; i < paragraphs; i++) {
       const length = this.randomInt(
         options.contentLength.min / paragraphs,
-        options.contentLength.max / paragraphs
+        options.contentLength.max / paragraphs,
       );
       const wordCount = Math.floor(length / 6); // Approximate words
       content.push(`<p>${this.generateLorem(wordCount, wordCount * 2)}</p>`);
@@ -192,7 +204,7 @@ export class FeedGenerator {
           content.splice(
             insertAt,
             0,
-            `<img src="${image.originalUrl}" alt="Image ${i + 1}" />`
+            `<img src="${image.originalUrl}" alt="Image ${i + 1}" />`,
           );
         }
       }
@@ -201,7 +213,7 @@ export class FeedGenerator {
     return content.join('\n');
   }
 
-  private generateItem(index: number): GeneratedItem {
+  private generateItem(index: number, source?: string): GeneratedItem {
     const { contentOptions, fieldBehavior } = this.config;
 
     // Check for forced empty fields
@@ -238,10 +250,9 @@ export class FeedGenerator {
 
     // Apply field presence logic
     if (!forceEmpty.has('title') && this.shouldIncludeField('title')) {
-      item.title =
-        TITLES[index % TITLES.length] +
-        ' - ' +
-        this.generateLorem(3, 6).slice(0, -1);
+      const baseTitle = TITLES[index % TITLES.length];
+      const subtitle = this.generateLorem(3, 6).slice(0, -1);
+      item.title = `${source && source !== 'default' ? `[${source}] ` : ''}${baseTitle} - ${subtitle}`;
       if (forceInvalid.has('title')) {
         item.title = ''; // Force empty
       }
@@ -250,7 +261,7 @@ export class FeedGenerator {
     if (!forceEmpty.has('summary') && this.shouldIncludeField('summary')) {
       item.summary = this.generateLorem(
         Math.floor(contentOptions.summaryLength.min / 6),
-        Math.floor(contentOptions.summaryLength.max / 6)
+        Math.floor(contentOptions.summaryLength.max / 6),
       );
     }
 
@@ -286,7 +297,7 @@ export class FeedGenerator {
       item.categories = this.pickRandomN(
         CATEGORIES,
         contentOptions.categoryCount.min,
-        contentOptions.categoryCount.max
+        contentOptions.categoryCount.max,
       );
     }
 
@@ -303,17 +314,63 @@ export class FeedGenerator {
 
   regenerate(): void {
     this.state.items = Array.from({ length: this.config.itemCount }, (_, i) =>
-      this.generateItem(i)
+      this.generateItem(i),
     );
     this.state.lastUpdate = Date.now();
     this.state.updateCount++;
     console.log(
-      `[Generator] Regenerated ${this.state.items.length} items (update #${this.state.updateCount})`
+      `[Generator] Regenerated ${this.state.items.length} items (update #${this.state.updateCount})`,
     );
   }
 
-  getItems(): GeneratedItem[] {
-    return this.state.items;
+  getItems(source?: string): GeneratedItem[] {
+    if (!source || source === 'default') {
+      return this.state.items;
+    }
+
+    // Generate items specifically for this source
+    return this.generateItemsForSource(source);
+  }
+
+  private generateItemsForSource(source: string): GeneratedItem[] {
+    // Create a seeded random generator based on the source
+    const seed = this.hashString(source);
+    const seededRandom = this.createSeededRandom(seed);
+
+    // Create a temporary generator instance with seeded random
+    const originalRandom = Math.random;
+    Math.random = seededRandom;
+
+    try {
+      // Generate items using the seeded random
+      const items = Array.from({ length: this.config.itemCount }, (_, i) =>
+        this.generateItem(i, source),
+      );
+
+      return items;
+    } finally {
+      // Restore original random function
+      Math.random = originalRandom;
+    }
+  }
+
+  private hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  private createSeededRandom(seed: number): () => number {
+    // Simple seeded random number generator
+    let x = Math.sin(seed) * 10000;
+    return function () {
+      x = Math.sin(x) * 10000;
+      return x - Math.floor(x);
+    };
   }
 
   getState() {

@@ -2,7 +2,7 @@ import type { FeedConfig, GeneratedItem } from '../types';
 
 export function formatGenericXml(
   items: GeneratedItem[],
-  config: FeedConfig
+  config: FeedConfig,
 ): string {
   const escapeXml = (str: string) =>
     str

@@ -1,4 +1,4 @@
-import { createServer } from "./src/server";
+import { createServer } from './src/server';
 
 // Use Bun's hot module replacement
 if (import.meta.hot) {

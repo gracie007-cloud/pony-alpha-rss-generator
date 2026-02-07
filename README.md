@@ -5,6 +5,7 @@ A highly customizable RSS feed generator built with Bun, designed for testing RS
 ## ✨ Features
 
 ### 📡 Multiple Feed Formats
+
 - **RSS** (multiple versions: RSS 2.0, RSS 0.91, RSS 0.92)
 - **ATOM** feeds
 - **JSON Feed** format
@@ -12,7 +13,15 @@ A highly customizable RSS feed generator built with Bun, designed for testing RS
 - **NEWSML** and **NEWSML-G2** (News Markup Language)
 - **NITF** (News Industry Text Format)
 
+### 🎭 Multiple Feed Sources
+
+- **Source Parameter** - Use `?source=name` to create different feed providers
+- **Seeded Generation** - Each source generates consistent but unique content
+- **Source Identification** - Titles include source names for easy identification
+- **Provider Isolation** - No URL conflicts between different providers
+
 ### 🎯 Advanced Content Generation
+
 - **Configurable field presence** - Control probability of each field being included
 - **Realistic content generation** - Lorem ipsum with proper capitalization and formatting
 - **Media support** - Images, videos, and embedded content
@@ -21,6 +30,7 @@ A highly customizable RSS feed generator built with Bun, designed for testing RS
 - **Category support** - Multiple categories per item
 
 ### 🎮 Web-based UI Dashboard
+
 - **Real-time configuration** - Modify settings without restarting
 - **Live preview** - See generated feed items instantly
 - **Endpoint management** - Enable/disable specific feed formats
@@ -28,6 +38,7 @@ A highly customizable RSS feed generator built with Bun, designed for testing RS
 - **Force empty/invalid fields** - Perfect for testing error handling
 
 ### ⚙️ Configuration Options
+
 - **Feed metadata** - Title, description, language, base URL
 - **Item count** - Control number of generated feed items
 - **Content options** - Length ranges, media inclusion, HTML support
@@ -37,6 +48,7 @@ A highly customizable RSS feed generator built with Bun, designed for testing RS
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - [Bun](https://bun.sh) runtime (recommended) or Node.js
 
 ### Installation
@@ -69,22 +81,26 @@ Access the web dashboard at `http://localhost:3000/ui` (or your configured port)
 ### Dashboard Features
 
 #### 📡 Feed Endpoints
+
 - View all available feed URLs
 - Copy endpoint URLs with one click
 - See format types for each endpoint
 
 #### ⚡ Quick Actions
+
 - **Regenerate Items** - Generate new feed content immediately
 - **Reset Config** - Restore default settings
 - **Update Interval** - Set auto-regeneration timing
 
 #### 📰 Feed Settings
+
 - **Feed Title** - Main feed title
 - **Description** - Feed description
 - **Base URL** - Root URL for generated links
 - **Item Count** - Number of items to generate
 
 #### 📝 Content Options
+
 - **Title/Content Length** - Min/max character ranges
 - **Image/Video Settings** - Count ranges and inclusion toggles
 - **Category Settings** - Number of categories per item
@@ -92,29 +108,52 @@ Access the web dashboard at `http://localhost:3000/ui` (or your configured port)
 - **HTML Support** - Include HTML in content
 
 #### 🎯 Field Behavior
+
 Control the probability (0-100%) of each field appearing:
+
 - **Presence Tab** - Set probabilities for all fields
 - **Force Empty** - Select fields to always be empty
 - **Force Invalid** - Select fields with invalid values
 
 #### 👁️ Live Preview
+
 - View the most recent 10 generated items
 - See titles, authors, dates, and categories
 - Real-time updates when settings change
 
 ## 📡 Available Endpoints
 
-| Endpoint | Format | Description |
-|----------|--------|-------------|
-| `/feed` | RSS 2.0 | Standard RSS feed |
-| `/feed/rss091` | RSS 0.91 | Legacy RSS format |
-| `/feed/rss092` | RSS 0.92 | Legacy RSS format |
-| `/feed/atom` | ATOM | Atom syndication format |
-| `/feed/json` | JSON | JSON Feed format |
-| `/feed/xml` | XML | Generic XML format |
-| `/feed/newsml` | NEWSML | News Markup Language |
-| `/feed/newsml-g2` | NEWSML-G2 | NewsML Generation 2 |
-| `/feed/nitf` | NITF | News Industry Text Format |
+| Endpoint          | Format    | Description               |
+| ----------------- | --------- | ------------------------- |
+| `/feed`           | RSS 2.0   | Standard RSS feed         |
+| `/feed/rss091`    | RSS 0.91  | Legacy RSS format         |
+| `/feed/rss092`    | RSS 0.92  | Legacy RSS format         |
+| `/feed/atom`      | ATOM      | Atom syndication format   |
+| `/feed/json`      | JSON      | JSON Feed format          |
+| `/feed/xml`       | XML       | Generic XML format        |
+| `/feed/newsml`    | NEWSML    | News Markup Language      |
+| `/feed/newsml-g2` | NEWSML-G2 | NewsML Generation 2       |
+| `/feed/nitf`      | NITF      | News Industry Text Format |
+
+### Source Parameter
+
+All feed endpoints support a `?source=` query parameter to create multiple distinct feed providers:
+
+```bash
+# Default feed
+GET /feed
+
+# Provider-specific feeds
+GET /feed?source=cnn
+GET /feed?source=bbc
+GET /feed?source=foxnews
+
+# Works with all formats
+GET /feed/atom?source=techcrunch
+GET /feed/json?source=hackernews
+```
+
+Each source generates consistent but unique content, with titles including the source name for identification.
 
 ### API Endpoints
 
@@ -135,6 +174,7 @@ The generator uses a JSON configuration file (`config.json`) that is automatical
 ### Key Configuration Sections
 
 #### Feed Metadata
+
 ```json
 {
   "title": "Test RSS Feed Generator",
@@ -145,6 +185,7 @@ The generator uses a JSON configuration file (`config.json`) that is automatical
 ```
 
 #### Content Generation
+
 ```json
 {
   "contentOptions": {
@@ -158,6 +199,7 @@ The generator uses a JSON configuration file (`config.json`) that is automatical
 ```
 
 #### Field Behavior
+
 ```json
 {
   "fieldBehavior": {
@@ -174,6 +216,7 @@ The generator uses a JSON configuration file (`config.json`) that is automatical
 ## 🛠️ Development
 
 ### Project Structure
+
 ```
 src/
 ├── config.ts          # Configuration management
@@ -185,6 +228,7 @@ src/
 ```
 
 ### Building
+
 ```bash
 # Type checking
 bun run tsc --noEmit
@@ -194,6 +238,7 @@ bun run index
 ```
 
 ### Testing Feed Consumers
+
 This tool is perfect for testing RSS feed parsers, aggregators, and ingestion systems. Use the field behavior controls to simulate various edge cases:
 
 - **Missing fields** - Test how consumers handle optional fields

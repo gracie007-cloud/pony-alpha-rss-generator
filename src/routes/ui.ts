@@ -4,7 +4,7 @@ import type { FeedConfig } from '../types';
 
 export function createUiRoutes(
   generator: FeedGenerator,
-  configManager: ConfigManager
+  configManager: ConfigManager,
 ) {
   const apiRoutes = createApiRoutesInternal(generator, configManager);
 
@@ -22,7 +22,7 @@ export function createUiRoutes(
 
 function createApiRoutesInternal(
   generator: FeedGenerator,
-  configManager: ConfigManager
+  configManager: ConfigManager,
 ) {
   return {
     async handleGetConfig(): Promise<Response> {
@@ -30,19 +30,23 @@ function createApiRoutesInternal(
     },
 
     async handleUpdateConfig(request: Request): Promise<Response> {
-      const updates = await request.json() as Partial<FeedConfig>;
+      const updates = (await request.json()) as Partial<FeedConfig>;
       configManager.updateConfig(updates);
       return Response.json({ success: true });
     },
 
     async handleUpdateContentOptions(request: Request): Promise<Response> {
-      const updates = await request.json() as Partial<FeedConfig['contentOptions']>;
+      const updates = (await request.json()) as Partial<
+        FeedConfig['contentOptions']
+      >;
       configManager.updateContentOptions(updates);
       return Response.json({ success: true });
     },
 
     async handleUpdateFieldBehavior(request: Request): Promise<Response> {
-      const updates = await request.json() as Partial<FeedConfig['fieldBehavior']>;
+      const updates = (await request.json()) as Partial<
+        FeedConfig['fieldBehavior']
+      >;
       configManager.updateFieldBehavior(updates);
       return Response.json({ success: true });
     },
